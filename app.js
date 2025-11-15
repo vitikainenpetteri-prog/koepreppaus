@@ -17,8 +17,8 @@ document.getElementById("prepForm").addEventListener("submit", async function (e
     return;
   }
 
-  if (images.length === 1 && images[0].size > 2 * 1024 * 1024) {
-    output.textContent = "Kuva on liian suuri testiin (max noin 2 Mt).";
+  if (images.length === 1 && images[0].size > 10 * 1024 * 1024) {
+    output.textContent = "Kuva on liian suuri testiin (max noin 10 Mt).";
     return;
   }
 
