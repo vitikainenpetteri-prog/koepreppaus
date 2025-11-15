@@ -1,4 +1,4 @@
-// app.js
+// app.js – vankempi versio: tarkistukset + näkyvät statukset
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("prepForm");
@@ -14,13 +14,26 @@ document.addEventListener("DOMContentLoaded", function () {
   const WORKER_URL = "https://bold-dawn-2443.vitikainenpetteri.workers.dev";
 
   function setStatus(text) {
-    statusEl.textContent = text || "";
+    if (statusEl) statusEl.textContent = text || "";
   }
 
   function setLoading(isLoading) {
+    if (!generateBtn) return;
     generateBtn.disabled = isLoading;
     generateBtn.textContent = isLoading ? "Luodaan preppausta..." : "Luo preppaus";
   }
+
+  // Perustarkistus: löytyikö kaikki olennaiset elementit?
+  if (!form || !fileInput || !output || !outputCard || !generateBtn || !clearBtn || !pdfBtn) {
+    alert("Virhe: kaikki lomake-elementit eivät löytyneet. Varmista, että index.html on uusin versio.");
+    console.error("form:", form, "fileInput:", fileInput, "output:", output,
+                  "outputCard:", outputCard, "generateBtn:", generateBtn,
+                  "clearBtn:", clearBtn, "pdfBtn:", pdfBtn);
+    return;
+  }
+
+  // Näytä heti, että skripti on ladattu
+  setStatus("Valmis. Täytä kentät ja valitse kuvat, sitten 'Luo preppaus'.");
 
   // Näytä tiedostolista kun käyttäjä valitsee kuvia
   fileInput.addEventListener("change", function () {
@@ -40,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
   clearBtn.addEventListener("click", function () {
     form.reset();
     fileListEl.textContent = "";
-    setStatus("");
+    setStatus("Lomake tyhjennetty.");
     output.innerHTML = "";
     outputCard.style.display = "none";
   });
@@ -49,6 +62,11 @@ document.addEventListener("DOMContentLoaded", function () {
   pdfBtn.addEventListener("click", function () {
     if (!output.innerHTML.trim()) {
       setStatus("Ei preppausta ladattavaksi PDF:nä.");
+      return;
+    }
+
+    if (typeof html2pdf === "undefined") {
+      setStatus("PDF-kirjasto ei ole saatavilla (html2pdf).");
       return;
     }
 
@@ -77,6 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const grade = document.getElementById("grade").value.trim();
     const goal = document.getElementById("goal").value.trim();
     const files = Array.from(fileInput.files || []);
+
+    // Debug: kerrotaan aina, että nappia painettiin
+    setStatus("Lähetyspainiketta painettu, tarkistetaan syötteet...");
 
     // Kevyet tarkistukset
     if (!subject) {
@@ -128,13 +149,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!res.ok) {
         console.error("Virhevastauksen runko:", text);
-        output.innerHTML = `<p><strong>Virhe palvelimelta (${res.status}):</strong></p><pre>${text}</pre>`;
+        output.innerHTML =
+          `<p><strong>Virhe palvelimelta (${res.status}):</strong></p><pre>${text}</pre>`;
         setStatus("Virhe palvelimelta.");
         setLoading(false);
         return;
       }
 
-      // Vastauksen oletetaan olevan yksinkertaista HTML:ää
+      // Vastauksen oletetaan olevan HTML:ää
       output.innerHTML = text;
       setStatus("Preppaus valmis.");
     } catch (err) {
