@@ -1,62 +1,68 @@
-alert("app.js ladattu");  // näkyy kun skripti varmasti latautuu
+// app.js
 
-document.getElementById("prepForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("prepForm");
   const output = document.getElementById("output");
-  output.textContent = "Valmistellaan lähetystä...";
 
-  const subject = document.getElementById("subject").value;
-  const grade = document.getElementById("grade").value;
-  const goal = document.getElementById("goal").value;
-  const images = document.getElementById("images").files;
-
-  // Pieni turvaraja: maksimissaan 1 kuva ja max 8 Mt
-  if (images.length > 1) {
-    output.textContent = "Testivaiheessa sallitaan nyt vain 1 kuva kerrallaan.";
+  if (!form) {
+    console.error("prepForm-lomaketta ei löytynyt.");
     return;
   }
 
-  // max noin 8 Mt
-if (images.length === 1 && images[0].size > 8 * 1024 * 1024) {
-  output.textContent = "Kuva on liian suuri (max noin 8 Mt).";
-  return;
-}
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  }
+    output.textContent = "Valmistellaan lähetystä...";
 
-  const formData = new FormData();
-  formData.append("subject", subject);
-  formData.append("grade", grade);
-  formData.append("goal", goal);
+    const subject = document.getElementById("subject").value;
+    const grade = document.getElementById("grade").value;
+    const goal = document.getElementById("goal").value;
+    const images = document.getElementById("images").files;
 
-  if (images.length === 1) {
-    formData.append("images", images[0]);
-  }
-
-  output.textContent = "Lähetetään palvelimelle... tämä voi kestää hetken.";
-
-  try {
-    const res = await fetch("https://bold-dawn-2443.vitikainenpetteri.workers.dev", {
-      method: "POST",
-      body: formData
-    });
-
-    let bodyText;
-    try {
-      bodyText = await res.text();
-    } catch (e2) {
-      bodyText = "(ei saatu vastauksen runkoa luettua)";
-    }
-
-    if (!res.ok) {
-      output.textContent =
-        "Virhe palvelimelta: " + res.status + " " + res.statusText + "\n\n" + bodyText;
+    // Testivaihe: sallitaan vain 1 kuva, max ~8 Mt
+    if (images.length > 1) {
+      output.textContent = "Testivaiheessa sallitaan nyt vain 1 kuva kerrallaan.";
       return;
     }
 
-    output.textContent = bodyText;
-  } catch (err) {
-    output.textContent = "Fetch-virhe (selaimen päässä): " + err.message;
-  }
+    if (images.length === 1 && images[0].size > 8 * 1024 * 1024) {
+      output.textContent = "Kuva on liian suuri (max noin 8 Mt).";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("subject", subject);
+    formData.append("grade", grade);
+    formData.append("goal", goal);
+
+    if (images.length === 1) {
+      formData.append("images", images[0]);
+    }
+
+    output.textContent = "Lähetetään palvelimelle... tämä voi kestää hetken.";
+
+    try {
+      const res = await fetch("https://bold-dawn-2443.vitikainenpetteri.workers.dev", {
+        method: "POST",
+        body: formData
+      });
+
+      let bodyText;
+      try {
+        bodyText = await res.text();
+      } catch (e2) {
+        bodyText = "(ei saatu vastauksen runkoa luettua)";
+      }
+
+      if (!res.ok) {
+        output.textContent =
+          "Virhe palvelimelta: " + res.status + " " + res.statusText + "\n\n" + bodyText;
+        return;
+      }
+
+      output.textContent = bodyText;
+    } catch (err) {
+      output.textContent = "Fetch-virhe (selaimen päässä): " + err.message;
+    }
+  });
 });
