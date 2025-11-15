@@ -1,4 +1,6 @@
-document.getElementById("prepForm").onsubmit = async function (e) {
+alert("app.js ladattu");  // näkyy heti kun sivu aukeaa, jos skripti toimii
+
+document.getElementById("prepForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const subject = document.getElementById("subject").value;
@@ -6,21 +8,30 @@ document.getElementById("prepForm").onsubmit = async function (e) {
   const goal = document.getElementById("goal").value;
   const images = document.getElementById("images").files;
 
-  // tee FormData backendille
   const formData = new FormData();
   formData.append("subject", subject);
   formData.append("grade", grade);
   formData.append("goal", goal);
-
   for (let i = 0; i < images.length; i++) {
     formData.append("images", images[i]);
   }
 
-  const res = await fetch("https://bold-dawn-2443.vitikainenpetteri.workers.dev", {
-    method: "POST",
-    body: formData
-  });
+  try {
+    const res = await fetch("https://bold-dawn-2443.vitikainenpetteri.workers.dev", {
+      method: "POST",
+      body: formData
+    });
 
-  const text = await res.text();
-  document.getElementById("output").textContent = text;
-};
+    if (!res.ok) {
+      const errText = await res.text();
+      document.getElementById("output").textContent =
+        "Virhe: " + res.status + " " + res.statusText + "\n" + errText;
+      return;
+    }
+
+    const text = await res.text();
+    document.getElementById("output").textContent = text;
+  } catch (err) {
+    document.getElementById("output").textContent = "Fetch-virhe: " + err.message;
+  }
+});
