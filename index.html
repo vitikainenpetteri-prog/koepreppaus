@@ -8,7 +8,7 @@
 
 <h1>Koepreppaus – Luo preppaus kuvan perusteella</h1>
 
-<form id="prepForm">
+<form id="prepForm" enctype="multipart/form-data">
   <label>Oppiaine:</label><br>
   <input type="text" id="subject"><br><br>
 
@@ -18,15 +18,14 @@
   <label>Kokeen tavoite (esim. 6–10):</label><br>
   <input type="text" id="goal"><br><br>
 
-  <label>Lataa koealueen kuvat:</label><br>
-  <input type="file" id="images" multiple><br><br>
+  <label>Lataa koealueen kuva:</label><br>
+  <input type="file" id="images" name="images" accept="image/*"><br><br>
 
   <button type="submit">Luo preppaus</button>
 </form>
 
 <pre id="output"></pre>
 
-<!-- TÄRKEÄ: tässä vain viittaus app.js-tiedostoon -->
 <script src="app.js"></script>
 </body>
 </html>
