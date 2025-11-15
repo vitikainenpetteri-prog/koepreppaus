@@ -1,26 +1,32 @@
-document.getElementById("prepForm").onsubmit = async function (e) {
-  e.preventDefault();
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Koepreppaus</title>
+</head>
+<body>
 
-  const subject = document.getElementById("subject").value;
-  const grade = document.getElementById("grade").value;
-  const goal = document.getElementById("goal").value;
-  const images = document.getElementById("images").files;
+<h1>Koepreppaus – Luo preppaus kuvan perusteella</h1>
 
-  // tee FormData backendille
-  const formData = new FormData();
-  formData.append("subject", subject);
-  formData.append("grade", grade);
-  formData.append("goal", goal);
+<form id="prepForm">
+  <label>Oppiaine:</label><br>
+  <input type="text" id="subject"><br><br>
 
-  for (let i = 0; i < images.length; i++) {
-    formData.append("images", images[i]);
-  }
+  <label>Luokka-aste:</label><br>
+  <input type="text" id="grade"><br><br>
 
-  const res = await fetch("https://YOUR-WORKER.workers.dev/api/prep", {
-    method: "POST",
-    body: formData
-  });
+  <label>Kokeen tavoite (esim. 6–10):</label><br>
+  <input type="text" id="goal"><br><br>
 
-  const text = await res.text();
-  document.getElementById("output").textContent = text;
-};
+  <label>Lataa koealueen kuvat:</label><br>
+  <input type="file" id="images" multiple><br><br>
+
+  <button type="submit">Luo preppaus</button>
+</form>
+
+<pre id="output"></pre>
+
+<!-- TÄRKEÄ: tässä vain viittaus app.js-tiedostoon -->
+<script src="app.js"></script>
+</body>
+</html>
