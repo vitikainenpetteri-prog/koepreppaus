@@ -16,7 +16,7 @@ document.getElementById("prepForm").onsubmit = async function (e) {
     formData.append("images", images[i]);
   }
 
-  const res = await fetch("https://YOUR-WORKER.workers.dev/api/prep", {
+  const res = await fetch("https://bold-dawn-2443.vitikainenpetteri.workers.dev", {
     method: "POST",
     body: formData
   });
